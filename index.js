@@ -37,30 +37,31 @@ var hreq = https.request(options, function(res){
 hreq.end();
 
 function getQuestion() {
-	if(questionCount < question_pool.length) {
-		var acronym = question_pool[questionCount].tla;		
+	var acronym = question_pool[questionCount].tla;		
 
-		prompt.get([acronym], function(err, result){
-			if(err) {
-				return;
-			}
+	prompt.get([acronym], function(err, result){
+		if(err) {
+			return;
+		}
 
-			var input = result[acronym];
-			var answer = question_pool[questionCount].expanded;
+		var input = result[acronym];
+		var answer = question_pool[questionCount].expanded;
+		if(input.toLowerCase() === answer.toLowerCase()) {
+			console.warn(colors.green('CORRECT'));
+			++score;
+		} else {
+			if(showAnswers) console.warn(colors.red('INCORRECT ' + answer));
+			else console.warn(colors.red('INCORRECT'));
+		}
 
-			if(input.toLowerCase() === answer.toLowerCase()) {
-				prompt.message = colors.green('CORRECT' + '\n');
-				++score;
-			} else {
-				if(showAnswers) prompt.message = colors.red('INCORRECT ' + answer + '\n');
-				else prompt.message = colors.red('INCORRECT\n');
-			}
-
-			++questionCount;
-			prompt.message += 'Your score is ' + score + '/' + questionCount + '\n';
-			getQuestion();
-		});
-	}
+		++questionCount;
+		console.log('Your score is ' + score + '/' + questionCount + '\n');
+		
+		if(questionCount < question_pool.length) getQuestion();
+		else {
+			console.log('You finished with '+ (score*100/questionCount)+'% success\n');
+		}
+	});
 }
 
 function utilArrayShuffle(array) {
